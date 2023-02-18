@@ -23,7 +23,7 @@ router.post(
   "/",
   // middleware
   [
-    check("nombre", "El nombre es obligatorio").not().isEmpty(),
+    check("name", "El nombre es obligatorio").not().isEmpty(),
     check("password", "El password debe contener mas de 6 caracteres").isLength(
       { min: 6 }
     ),

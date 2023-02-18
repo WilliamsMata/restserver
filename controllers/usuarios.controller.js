@@ -24,11 +24,11 @@ const usuariosGet = async (req = request, res = response) => {
 // Crear usuario
 const usuariosPost = async (req, res) => {
   // recibimos los datos del body
-  const { nombre, email, password, role } = req.body;
+  const { name, email, password, role } = req.body;
 
   // creamos un nuevo usuario
   const usuario = new Usuario({
-    nombre,
+    name,
     email,
     password,
     role,
