@@ -71,9 +71,6 @@ const usuariosPatch = (req, res) => {
 const usuariosDelete = async (req, res) => {
   const { id } = req.params;
 
-  // Físicamente lo borramos de la base de datos
-  // const usuario = await Usuario.findByIdAndDelete(id);
-
   // cambiamos el status a false
   const usuario = await Usuario.findByIdAndUpdate(id, { status: false });
 
