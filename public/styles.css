@@ -1,0 +1,27 @@
+html {
+  box-sizing: border-box;
+}
+
+*,
+::after,
+::before {
+  box-sizing: inherit;
+  padding: 0;
+  margin: 0;
+}
+
+h1 {
+  margin-inline: auto;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+hr {
+  margin-block: 0.5rem;
+}
+
+.google {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

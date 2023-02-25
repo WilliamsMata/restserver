@@ -4,9 +4,59 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Acceso denegado</title>
+    <title>Google sign in</title>
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <h1>Acceso denegado</h1>
+    <h1>Google sign in</h1>
+    <hr />
+
+    <div class="google">
+      <div
+        id="g_id_onload"
+        data-client_id="1034403950995-91jee19p1r3v2r21rr3fnusn60gb3idb.apps.googleusercontent.com"
+        data-context="signin"
+        data-ux_mode="popup"
+        data-callback="handleGoogle"
+        data-nonce=""
+        data-auto_prompt="false"
+      ></div>
+
+      <div
+        class="g_id_signin"
+        data-type="standard"
+        data-shape="rectangular"
+        data-theme="outline"
+        data-text="signin_with"
+        data-size="large"
+        data-locale="en"
+        data-logo_alignment="left"
+      ></div>
+    </div>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+      const url = window.location.hostname.includes("localhost")
+        ? "http://localhost:8080/api/auth/google"
+        : "https://restserver-production-bb9c.up.railway.app/api/auth/google";
+
+      async function handleGoogle(response) {
+        const id_token = response.credential;
+        const data = { id_token };
+
+        try {
+          const resp = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+
+          const json = await resp.json();
+          console.log("Nuestro server", json);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    </script>
   </body>
 </html>
