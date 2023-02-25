@@ -42,13 +42,12 @@
 
       async function handleGoogle(response) {
         const id_token = response.credential;
-        const data = { id_token };
 
         try {
           const resp = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
+            body: JSON.stringify({ id_token }),
           });
 
           const json = await resp.json();
