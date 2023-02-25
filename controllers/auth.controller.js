@@ -3,6 +3,7 @@ const bcryptjs = require("bcryptjs");
 
 const Usuario = require("../models/usuario");
 const { genJWT } = require("../helpers/genJWT");
+const { googleVerify } = require("../helpers/google-verify");
 
 const login = async (req = request, res = response) => {
   const { email, password } = req.body;
@@ -12,14 +13,14 @@ const login = async (req = request, res = response) => {
     const usuario = await Usuario.findOne({ email });
     if (!usuario) {
       return res.status(400).json({
-        msg: "Incorrect credentials",
+        msg: "Credenciales incorrectas",
       });
     }
 
     // Verificar si el usuario esta activo en la base de datos
     if (!usuario.status) {
       return res.status(400).json({
-        msg: "Incorrect credentials",
+        msg: "Credenciales incorrectas",
       });
     }
 
@@ -27,7 +28,7 @@ const login = async (req = request, res = response) => {
     const isValidPassword = bcryptjs.compareSync(password, usuario.password);
     if (!isValidPassword) {
       return res.status(400).json({
-        msg: "Incorrect credentials",
+        msg: "Credenciales incorrectas",
       });
     }
 
@@ -50,10 +51,40 @@ const login = async (req = request, res = response) => {
 const googleSingIn = async (req = request, res = response) => {
   const { id_token } = req.body;
 
-  res.json({
-    msg: "todo ok en google sign in",
-    id_token,
-  });
+  try {
+    const { name, email, picture: img } = await googleVerify(id_token);
+
+    let usuario = await Usuario.findOne({ email });
+
+    if (!usuario) {
+      // crear el usuario
+      const data = {
+        name,
+        email,
+        password: ":P",
+        img,
+        google: true,
+      };
+      usuario = new Usuario(data);
+      await usuario.save();
+    }
+
+    // Si el usuario en DB tiene el status en false
+    if (!usuario.status) {
+      return res.status(401).json({
+        msg: "Hable con el administrador, usuario bloqueado",
+      });
+    }
+
+    // Generar el JWT
+    const token = await genJWT(usuario.id);
+
+    res.json({ usuario, token });
+  } catch (error) {
+    res.status(400).json({
+      msg: "Token de Google no es valido",
+    });
+  }
 };
 
 module.exports = {
