@@ -58,7 +58,7 @@ const createCategory = async (req = request, res = response) => {
       return res.status(201).json(categoryDB);
     } else {
       return res.status(404).json({
-        msg: `The ${categoryDB.name} category already exists`,
+        msg: `La categoria ${categoryDB.name} ya existe`,
       });
     }
   }
@@ -85,11 +85,11 @@ const updateCategory = async (req = request, res = response) => {
   data.user = req.usuario._id;
 
   try {
-    const categoryDB = await Categoria.findByIdAndUpdate(id, data, {
+    const categoria = await Categoria.findByIdAndUpdate(id, data, {
       new: true,
     }).populate("user", "name");
 
-    return res.status(200).json(categoryDB);
+    return res.status(200).json(categoria);
   } catch (error) {
     console.log(error);
     return res.status(500).json({

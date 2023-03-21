@@ -3,18 +3,18 @@ const { Schema, model } = require("mongoose");
 const CategoriaSchema = Schema({
   name: {
     type: String,
-    required: [true, "name is required"],
+    required: [true, "El nombre es requerido"],
     unique: true,
   },
   status: {
     type: Boolean,
     default: true,
-    required: [true, "status is required"],
+    required: [true, "El status es requerido"],
   },
   user: {
     type: Schema.Types.ObjectId,
     ref: "Usuario",
-    required: [true, "user is required"],
+    required: [true, "El usuario es requerido"],
   },
 });
 
