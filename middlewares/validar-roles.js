@@ -3,7 +3,7 @@ const { response, request } = require("express");
 const isAdminRole = (req = request, res = response, next) => {
   if (!req.usuario) {
     return res.status(500).json({
-      msg: "The role is being verified without first validating the token",
+      msg: "El rol se está verificando sin validar primero el token",
     });
   }
 
@@ -11,7 +11,7 @@ const isAdminRole = (req = request, res = response, next) => {
 
   if (role !== "ADMIN_ROLE") {
     return res.status(401).json({
-      msg: `${name} is not an admin user`,
+      msg: `${name} no es un administrador`,
     });
   }
 
@@ -22,13 +22,13 @@ const haveRole = (...roles) => {
   return (req = request, res = response, next) => {
     if (!req.usuario) {
       return res.status(500).json({
-        msg: "The role is being verified without first validating the token",
+        msg: "El rol se está verificando sin validar primero el token",
       });
     }
 
     if (!roles.includes(req.usuario.role)) {
       return res.status(401).json({
-        msg: `The service requires one of these roles: ${roles}`,
+        msg: `El servicio require uno de estos roles: ${roles}`,
       });
     }
 

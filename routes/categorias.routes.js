@@ -1,8 +1,15 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
-const { createCategory } = require("../controllers/categorias.controller");
 
-const { validarCampos, validarJWT } = require("../middlewares");
+const { validarCampos, validarJWT, isAdminRole } = require("../middlewares");
+const {
+  createCategory,
+  getCategories,
+  getCategory,
+  updateCategory,
+  deleteCategory,
+} = require("../controllers/categorias.controller");
+const { existeCategoriaPorID } = require("../helpers/db-validators");
 
 const router = Router();
 
@@ -11,34 +18,54 @@ const router = Router();
  */
 
 // Obtener todas las categorias - publico
-router.get("/", (req, res) => {
-  res.json("Get");
-});
+router.get("/", getCategories);
 
 // Obtener una categoria por id - publico
-router.get("/:id", (req, res) => {
-  res.json("Get");
-});
+router.get(
+  "/:id",
+  [
+    check("id", "Id invalido").isMongoId(),
+    check("id").custom(existeCategoriaPorID),
+    validarCampos,
+  ],
+  getCategory
+);
 
 // Crear una nueva categoria - privado - cualquiera con un token valido
 router.post(
   "/",
   [
     validarJWT,
-    check("name", "Name is required").not().isEmpty(),
+    check("name", "El nombre (name) es requerido").not().isEmpty(),
     validarCampos,
   ],
   createCategory
 );
 
 // Actualizar una categoria por id - privado - cualquiera con un token valido
-router.put("/:id", (req, res) => {
-  res.json("Put");
-});
+router.put(
+  "/:id",
+  [
+    validarJWT,
+    check("id", "Id invalido").isMongoId(),
+    check("name", "El nombre (name) es requerido").notEmpty(),
+    check("id").custom(existeCategoriaPorID),
+    validarCampos,
+  ],
+  updateCategory
+);
 
 // Borrar una categoria por id - Admin
-router.delete("/:id", (req, res) => {
-  res.json("Delete");
-});
+router.delete(
+  "/:id",
+  [
+    validarJWT,
+    check("id", "Id invalido").isMongoId(),
+    isAdminRole,
+    check("id").custom(existeCategoriaPorID),
+    validarCampos,
+  ],
+  deleteCategory
+);
 
 module.exports = router;

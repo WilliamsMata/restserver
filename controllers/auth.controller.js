@@ -43,7 +43,7 @@ const login = async (req = request, res = response) => {
     console.log(error);
 
     res.status(500).json({
-      msg: "There was a server error processing your request. Please try again later or contact support if the problem persists.",
+      msg: "Hubo un error en el servidor al procesar su solicitud. Vuelva a intentarlo más tarde o póngase en contacto con el soporte si el problema persiste.",
     });
   }
 };
