@@ -51,7 +51,7 @@ const createProduct = async (req = request, res = response) => {
 
   const productDB = await Producto.findOne({
     name: body.name.toUpperCase(),
-    category,
+    category: body.category,
   });
 
   if (productDB) {
