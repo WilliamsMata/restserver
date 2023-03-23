@@ -1,3 +1,6 @@
+const path = require("path");
+const fs = require("fs");
+
 const { request, response } = require("express");
 const { subirArchivo } = require("../helpers");
 
@@ -19,34 +22,42 @@ const actualizarImagen = async (req = request, res = response) => {
 
   let modelo;
 
-  try {
-    switch (coleccion) {
-      case "usuarios":
-        modelo = await Usuario.findById(id);
+  switch (coleccion) {
+    case "usuarios":
+      modelo = await Usuario.findById(id);
 
-        if (!modelo) {
-          return res.status(400).json({ msg: "No existe el usuario" });
-        }
-        break;
+      if (!modelo) {
+        return res.status(400).json({ msg: "No existe el usuario" });
+      }
+      break;
 
-      case "productos":
-        modelo = await Producto.findById(id);
+    case "productos":
+      modelo = await Producto.findById(id);
 
-        if (!modelo) {
-          return res.status(400).json({ msg: "No existe el producto" });
-        }
-        break;
+      if (!modelo) {
+        return res.status(400).json({ msg: "No existe el producto" });
+      }
+      break;
 
-      default:
-        return res.status(500).json({
-          msg: "Se me olvido validar esto",
-        });
+    default:
+      return res.status(500).json({
+        msg: "Se me olvido validar esto",
+      });
+  }
+
+  // Limpiar imagenes previas
+  if (modelo.img) {
+    // Hay que borrar la imagen del servidor
+    const pathImagen = path.join(
+      __dirname,
+      "../uploads",
+      coleccion,
+      modelo.img
+    );
+
+    if (fs.existsSync(pathImagen)) {
+      fs.unlinkSync(pathImagen);
     }
-  } catch (error) {
-    return res.status(500).json({
-      msg: "Internal server error",
-      error,
-    });
   }
 
   try {
