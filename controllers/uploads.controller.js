@@ -1,6 +1,10 @@
 const path = require("path");
 const fs = require("fs");
 
+const cloudinary = require("cloudinary").v2;
+// Configuration
+cloudinary.config(process.env.CLOUDINARY_URL);
+
 const { request, response } = require("express");
 const { subirArchivo } = require("../helpers");
 
@@ -65,11 +69,64 @@ const actualizarImagen = async (req = request, res = response) => {
     modelo.img = nombre;
 
     await modelo.save();
+
+    res.json(modelo);
   } catch (msg) {
     return res.status(404).json({ msg });
   }
+};
 
-  res.json(modelo);
+const actualizarImagenCloudinary = async (req = request, res = response) => {
+  const { id, coleccion } = req.params;
+
+  let modelo;
+
+  switch (coleccion) {
+    case "usuarios":
+      modelo = await Usuario.findById(id);
+
+      if (!modelo) {
+        return res.status(400).json({ msg: "No existe el usuario" });
+      }
+      break;
+
+    case "productos":
+      modelo = await Producto.findById(id);
+
+      if (!modelo) {
+        return res.status(400).json({ msg: "No existe el producto" });
+      }
+      break;
+
+    default:
+      return res.status(500).json({
+        msg: "Se me olvido validar esto",
+      });
+  }
+
+  // Limpiar imagenes previas
+  if (modelo.img) {
+    // Hay que borrar la imagen del servidor
+    const nombre = modelo.img.split("/").at(-1);
+    const [public_id] = nombre.split(".");
+
+    cloudinary.uploader.destroy(`CAFE-NODE/${public_id}`);
+  }
+
+  const { tempFilePath } = req.files.archivo;
+
+  try {
+    const { secure_url } = await cloudinary.uploader.upload(tempFilePath, {
+      folder: "CAFE-NODE",
+    });
+
+    modelo.img = secure_url;
+    await modelo.save();
+
+    res.json(modelo);
+  } catch (error) {
+    return res.status(404).json({ error });
+  }
 };
 
 const mostrarImagen = async (req = request, res = response) => {
@@ -122,5 +179,6 @@ const mostrarImagen = async (req = request, res = response) => {
 module.exports = {
   cargarArchivo,
   actualizarImagen,
+  actualizarImagenCloudinary,
   mostrarImagen,
 };
