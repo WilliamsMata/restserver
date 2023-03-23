@@ -6,6 +6,7 @@ const { coleccionesPermitidas } = require("../helpers");
 const {
   cargarArchivo,
   actualizarImagen,
+  mostrarImagen,
 } = require("../controllers/uploads.controller");
 
 const router = Router();
@@ -23,6 +24,18 @@ router.put(
     validarCampos,
   ],
   actualizarImagen
+);
+
+router.get(
+  "/:coleccion/:id",
+  [
+    check("id", "el id debe ser un id de mongo").isMongoId(),
+    check("coleccion").custom((coleccion) =>
+      coleccionesPermitidas(coleccion, ["usuarios", "productos"])
+    ),
+    validarCampos,
+  ],
+  mostrarImagen
 );
 
 module.exports = router;
